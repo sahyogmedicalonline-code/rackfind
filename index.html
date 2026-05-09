@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sahyog Medical - Rack Finder</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      background:linear-gradient(135deg,#0f172a,#1e293b);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      color:white;
+    }
+
+    .container{
+      width:100%;
+      max-width:700px;
+      background:rgba(255,255,255,0.08);
+      backdrop-filter:blur(15px);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:28px;
+      padding:35px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.35);
+    }
+
+    .logo{
+      width:80px;
+      height:80px;
+      margin:auto;
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#06b6d4,#2563eb);
+      font-size:36px;
+      margin-bottom:20px;
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:10px;
+      font-size:32px;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:#cbd5e1;
+      margin-bottom:30px;
+      font-size:15px;
+    }
+
+    .login-section,
+    .app-section{
+      width:100%;
+    }
+
+    .login-section{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      margin-bottom:25px;
+    }
+
+    button{
+      width:100%;
+      padding:18px 20px;
+      border:none;
+      outline:none;
+      border-radius:18px;
+      background:linear-gradient(135deg,#06b6d4,#2563eb);
+      color:white;
+      font-size:16px;
+      font-weight:600;
+      cursor:pointer;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+      opacity:.95;
+    }
+
+    .login-error{
+      color:#fecaca;
+      font-size:14px;
+      min-height:20px;
+      text-align:center;
+    }
+
+    input{
+      width:100%;
+      padding:18px 20px;
+      border:none;
+      outline:none;
+      border-radius:18px;
+      background:rgba(255,255,255,0.1);
+      color:white;
+      font-size:16px;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    input:focus{
+      border-color:#38bdf8;
+      box-shadow:0 0 0 4px rgba(56,189,248,0.2);
+    }
+
+    input::placeholder{
+      color:#cbd5e1;
+    }
+
+    .results{
+      margin-top:25px;
+      display:grid;
+      gap:16px;
+    }
+
+    .card{
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;
+      padding:20px;
+    }
+
+    .medicine-name{
+      font-size:22px;
+      font-weight:600;
+      margin-bottom:12px;
+    }
+
+    .rack{
+      display:inline-block;
+      padding:10px 18px;
+      border-radius:12px;
+      background:linear-gradient(135deg,#06b6d4,#2563eb);
+      font-weight:600;
+    }
+
+    .not-found{
+      text-align:center;
+      padding:25px;
+      border-radius:18px;
+      background:rgba(239,68,68,0.1);
+      color:#fca5a5;
+    }
+
+    .loading{
+      margin-top:20px;
+      text-align:center;
+      color:#cbd5e1;
+    }
+
+    .footer{
+      margin-top:25px;
+      text-align:center;
+      font-size:13px;
+      color:#94a3b8;
+    }
+
+    @media(max-width:600px){
+
+      .container{
+        padding:25px;
+      }
+
+      h1{
+        font-size:26px;
+      }
+
+      .medicine-name{
+        font-size:18px;
+      }
+
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="logo">💊</div>
+
+    <h1>Sahyog Medical</h1>
+
+    <div class="subtitle">
+      Medicine Rack Finder
+    </div>
+
+    <div class="login-section" id="loginSection">
+      <input
+        type="text"
+        id="usernameInput"
+        placeholder="Username"
+        autocomplete="username"
+      >
+      <input
+        type="password"
+        id="passwordInput"
+        placeholder="Password"
+        autocomplete="current-password"
+      >
+      <button id="loginButton">Unlock Search</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+
+    <div class="app-section" id="appSection" style="display:none;">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search medicine name..."
+      >
+
+    <div class="loading" id="loading">
+      Loading medicines...
+    </div>
+
+    <div class="results" id="results"></div>
+
+    <div class="footer">
+      Powered by Sahyog
+    </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    // PASTE YOUR APPS SCRIPT WEB APP URL HERE
+
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfRR9zI1O76zZ641_gtnsJSUvJHqPqfKSf92AltUnvuZEWRFSlqZGhCnbiY2oJBXmw/exec";
+
+    let medicines = [];
+
+    const searchInput = document.getElementById('searchInput');
+    const resultsDiv = document.getElementById('results');
+    const loadingDiv = document.getElementById('loading');
+
+    async function loadMedicines(){
+
+      try{
+
+        if(API_URL.includes('PASTE_YOUR')){
+          loadingDiv.innerHTML = 'Apps Script URL not added';
+          return;
+        }
+
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        medicines = data;
+
+        loadingDiv.style.display = 'none';
+
+        resultsDiv.innerHTML = '';
+
+      }catch(error){
+
+        console.log(error);
+
+        loadingDiv.innerHTML = 'Unable to load medicines';
+
+      }
+
+    }
+
+    function renderResults(items){
+
+      if(items.length === 0){
+
+        resultsDiv.innerHTML = `
+          <div class="not-found">
+            Medicine not found ❌
+          </div>
+        `;
+
+        return;
+      }
+
+      resultsDiv.innerHTML = items.map(item => `
+
+        <div class="card">
+
+          <div class="medicine-name">
+            ${item.name}
+          </div>
+
+          <div class="rack">
+            Rack: ${item.rack}
+          </div>
+
+        </div>
+
+      `).join('');
+
+    }
+
+    searchInput.addEventListener('input',()=>{
+
+      const value = searchInput.value.toLowerCase().trim();
+
+      if(value === ''){
+        resultsDiv.innerHTML = '';
+        return;
+      }
+
+      const filtered = medicines.filter(item =>
+        item.name.toLowerCase().includes(value)
+      );
+
+      renderResults(filtered);
+
+    });
+
+    const USERNAME = '7415543744';
+    const PASSWORD = 'sahyogmnsrack';
+    const loginSection = document.getElementById('loginSection');
+    const appSection = document.getElementById('appSection');
+    const usernameInput = document.getElementById('usernameInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginButton = document.getElementById('loginButton');
+    const loginError = document.getElementById('loginError');
+
+    function showApp(){
+      loginSection.style.display = 'none';
+      appSection.style.display = 'block';
+      loadMedicines();
+    }
+
+    function checkLogin(){
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      if(username === USERNAME && password === PASSWORD){
+        sessionStorage.setItem('rackFinderLoggedIn', 'true');
+        loginError.textContent = '';
+        showApp();
+        return;
+      }
+
+      loginError.textContent = 'Invalid username or password.';
+      passwordInput.value = '';
+    }
+
+    loginButton.addEventListener('click', checkLogin);
+    passwordInput.addEventListener('keydown', event => {
+      if(event.key === 'Enter'){
+        checkLogin();
+      }
+    });
+
+    if(sessionStorage.getItem('rackFinderLoggedIn') === 'true'){
+      showApp();
+    }
+
+  </script>
+
+</body>
+</html>
