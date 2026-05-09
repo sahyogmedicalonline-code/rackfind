@@ -225,7 +225,7 @@
       <input
         type="text"
         id="searchInput"
-        placeholder="Search medicine name..."
+        placeholder="Search medicine name or rack..."
       >
 
     <div class="loading" id="loading">
@@ -323,7 +323,8 @@
       }
 
       const filtered = medicines.filter(item =>
-        item.name.toLowerCase().includes(value)
+        item.name.toLowerCase().includes(value) ||
+        item.rack.toLowerCase().includes(value)
       );
 
       renderResults(filtered);
