@@ -141,7 +141,14 @@
     .medicine-name{
       font-size:22px;
       font-weight:600;
+      margin-bottom:4px;
+    }
+
+    .formula-name{
+      font-size:14px;
+      color:#94a3b8;
       margin-bottom:12px;
+      line-height:1.4;
     }
 
     .alternate-heading{
@@ -318,6 +325,7 @@
           <div class="medicine-name">
             ${item.name}
           </div>
+          ${item.formula ? `<div class="formula-name">${item.formula}</div>` : ''}
           <div class="rack">
             Rack: ${item.rack}
           </div>
@@ -373,21 +381,7 @@
         return;
       }
 
-      resultsDiv.innerHTML = items.map(item => `
-
-        <div class="card">
-
-          <div class="medicine-name">
-            ${item.name}
-          </div>
-
-          <div class="rack">
-            Rack: ${item.rack}
-          </div>
-
-        </div>
-
-      `).join('');
+      resultsDiv.innerHTML = items.map(item => renderMedicineCard(item)).join('');
 
     }
 
