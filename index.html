@@ -144,6 +144,26 @@
       margin-bottom:12px;
     }
 
+    .alternate-heading{
+      font-size:18px;
+      font-weight:700;
+      margin-bottom:12px;
+    }
+
+    .alternate-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 0;
+      border-top:1px solid rgba(255,255,255,0.08);
+      color:#e2e8f0;
+      font-size:15px;
+    }
+
+    .alternate-item:first-child{
+      border-top:none;
+    }
+
     .rack{
       display:inline-block;
       padding:10px 18px;
@@ -282,6 +302,64 @@
 
     }
 
+    function dedupeItems(items){
+      const seen = new Set();
+      return items.filter(item => {
+        const key = `${item.name.toLowerCase()}|${item.rack.toLowerCase()}`;
+        if(seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function renderMedicineCard(item){
+      return `
+        <div class="card">
+          <div class="medicine-name">
+            ${item.name}
+          </div>
+          <div class="rack">
+            Rack: ${item.rack}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAlternateSection(current){
+      if(!current.formula || !current.formula.trim()){
+        return '';
+      }
+
+      const formula = current.formula.toLowerCase().trim();
+      const alternates = dedupeItems(medicines)
+        .filter(item => {
+          const itemFormula = item.formula && item.formula.toLowerCase().trim();
+          return itemFormula === formula &&
+            (item.name.toLowerCase() !== current.name.toLowerCase() ||
+             item.rack.toLowerCase() !== current.rack.toLowerCase());
+        });
+
+      if(alternates.length === 0){
+        return '';
+      }
+
+      return `
+        <div class="card">
+          <div class="alternate-heading">Alternate Medicines</div>
+          ${alternates.map(item => `
+            <div class="alternate-item">
+              <span>${item.name}</span>
+              <span>${item.rack}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderSelectedMedicine(item){
+      resultsDiv.innerHTML = renderMedicineCard(item) + renderAlternateSection(item);
+    }
+
     function renderResults(items){
 
       if(items.length === 0){
@@ -326,6 +404,17 @@
         item.name.toLowerCase().includes(value) ||
         item.rack.toLowerCase().includes(value)
       );
+
+      const exactMatch = medicines.find(item => item.name.toLowerCase() === value);
+      if(exactMatch){
+        renderSelectedMedicine(exactMatch);
+        return;
+      }
+
+      if(filtered.length === 1){
+        renderSelectedMedicine(filtered[0]);
+        return;
+      }
 
       renderResults(filtered);
 
